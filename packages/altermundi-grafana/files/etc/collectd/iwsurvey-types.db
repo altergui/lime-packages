@@ -1,0 +1,2 @@
+iwsurvey frequency:GAUGE:0:U, noise:GAUGE:-256:0, active:COUNTER:0:U, busy:COUNTER:0:U, receive:COUNTER:0:U, transmit:COUNTER:0:U
+
