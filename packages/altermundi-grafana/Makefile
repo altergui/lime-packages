@@ -18,7 +18,9 @@ define Package/$(PKG_NAME)
   CATEGORY:=Utilities
   TITLE:=$(PKG_NAME) allows AlterMundi to gather statistics in https://grafana.altermundi.net
   MAINTAINER:=Gui Iribarren <gui@altermundi.net>
-  DEPENDS:= +collectd \
+  DEPENDS:= \
+            +libuci-lua \
+            +collectd \
             +collectd-mod-cpu \
             +collectd-mod-conntrack \
             +collectd-mod-exec \
