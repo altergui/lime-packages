@@ -35,4 +35,16 @@ print(
   " N:"..bat_hosts
 )
 
+
+local dhcp_hosts = 0
+for _ in io.lines('/tmp/dhcp.hosts_remote') do
+  dhcp_hosts = dhcp_hosts + 1
+end
+
+print(
+  "PUTVAL"..
+  " "..hostname.."/randomstuff-linecount/gauge-dhcp_hosts"..
+  " N:"..dhcp_hosts
+)
+
 uci:close()
