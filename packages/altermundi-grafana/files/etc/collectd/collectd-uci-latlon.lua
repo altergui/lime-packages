@@ -18,14 +18,8 @@ local lon = uci:get("libremap", "location", "longitude")
 
 print(
   "PUTVAL"..
-  " "..hostname.."/uci-libremap_location/gauge-latitude"..
-  " N:"..lat
-)
-
-print(
-  "PUTVAL"..
-  " "..hostname.."/uci-libremap_location/gauge-longitude"..
-  " N:"..lon
+  " "..hostname.."/uci-libremap_location/voltage_threshold-latlon"..
+  " N:"..lat..":"..lon
 )
 
 uci:close()
