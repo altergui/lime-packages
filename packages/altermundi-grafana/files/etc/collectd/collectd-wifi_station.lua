@@ -50,6 +50,12 @@ local function scrape()
   local metric_wifi_station_tx_bytes = metric('wifi_station_transmit_bytes_total', 'counter')
   local metric_wifi_station_rx_bytes = metric('wifi_station_receive_bytes_total', 'counter')
 
+  local metric_wifi_station_signal_iwavg = metric('wifi_station_signal_iwavg', 'gauge')
+  local metric_wifi_station_signal_iwchain0 = metric('wifi_station_signal_iwchain0', 'gauge')
+  local metric_wifi_station_signal_iwchain1 = metric('wifi_station_signal_iwchain1', 'gauge')
+  local metric_wifi_station_iwtxpackets = metric('wifi_station_signal_iwtxpackets', 'counter')
+  local metric_wifi_station_iwtxretries = metric('wifi_station_signal_iwtxretries', 'counter')
+  local metric_wifi_station_iwtxfailed = metric('wifi_station_signal_iwtxfailed', 'counter')
 
   local u = ubus.connect()
   local status = u:call("network.wireless", "status", {})
@@ -86,6 +92,29 @@ local function scrape()
       end
       if station.rx_bytes then
         metric_wifi_station_rx_bytes(ifname, mac, station.rx_bytes)
+      end
+
+      local iwstation = io.popen("iw "..ifname.." station get "..mac, "r")
+      if iwstation then
+          local l
+          repeat
+              l = iwstation:read("*l")
+              if l then
+                local mix, chain0, chain1 = l:match("signal avg:[^%d]+(%d+)[^%d]+(%d+)[^%d]+(%d+)")
+                local txpackets  = l:match("tx packets:%s+(%d+)")
+                local txretries  = l:match("tx retries:%s+(%d+)")
+                local txfailed = l:match("tx failed:%s+(%d+)")
+                if chain0 and chain1 then
+                  metric_wifi_station_signal_iwavg(ifname, mac, "-"..mix)
+                  metric_wifi_station_signal_iwchain0(ifname, mac, "-"..chain0)
+                  metric_wifi_station_signal_iwchain1(ifname, mac, "-"..chain1)
+                end
+                if txpackets then metric_wifi_station_iwtxpackets(ifname, mac, txpackets) end
+                if txretries then metric_wifi_station_iwtxretries(ifname, mac, txretries) end
+                if txfailed  then metric_wifi_station_iwtxfailed(ifname, mac, txfailed)   end
+              end
+          until not l
+          iwstation:close()
       end
     end
   end
