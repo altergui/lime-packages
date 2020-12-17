@@ -18,11 +18,18 @@
 
 local JSON = require("luci.jsonc")
 
+local uci = require("uci"):cursor()
+
+local own_ipv6 = uci:get("network", "lan", "ip6addr")
+if own_ipv6 then own_ipv6_prefix = own_ipv6:gsub("::.*$", "::") end
+
 local outputTable = {}
 
 for key,value in pairs(
 	JSON.parse(io.stdin:read("*all")) ) do
-		table.insert(outputTable, key)
+		if key:match(own_ipv6_prefix) then
+			table.insert(outputTable, key)
+		end
 end
 
 local outputFile = io.open("/var/hosts/shared-state-dnsmasq_hosts", "w")
