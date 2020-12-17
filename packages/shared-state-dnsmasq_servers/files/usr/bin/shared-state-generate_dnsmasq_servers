@@ -35,6 +35,7 @@ for key,value in pairs(
  JSON.parse(io.stdin:read("*all")) ) do
  if value.data and value.author ~= localHostname and key ~= localDomain then
    table.insert(content, "server=/" .. key .. "/" .. value.data)
+   table.insert(content, "rev-server=" .. value.data:gsub("1$","/64") .. "," .. value.data)
  end
 end
 
